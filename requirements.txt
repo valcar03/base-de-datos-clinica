@@ -1,0 +1,5 @@
+tkinter
+Pillow
+datetime
+sqlite3
+re
