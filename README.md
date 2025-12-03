@@ -18,5 +18,5 @@ Una aplicación de escritorio para gestionar pacientes, citas y tratamientos en 
 
   Instalación
    Requisitos
-```bash
+   bash
 pip install -r requirements.txt
