@@ -70,6 +70,7 @@ class PodologiaApp:
         btn_frame.grid(row=2, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=5)
         
         ttk.Button(btn_frame, text="Nuevo Paciente", command=self.nuevo_paciente).pack(side=tk.LEFT, fill=tk.X, expand=True)
+        ttk.Button(btn_frame, text="Editar", command=self.editar_paciente).pack(side=tk.LEFT, fill=tk.X, expand=True)
         ttk.Button(btn_frame, text="Eliminar", command=self.eliminar_paciente).pack(side=tk.LEFT, fill=tk.X, expand=True)
         
         # Configurar grid left frame
@@ -163,15 +164,7 @@ class PodologiaApp:
         
         self.citas_frame.columnconfigure(0, weight=1)
         self.citas_frame.rowconfigure(1, weight=1)
-
-                # Botones de pacientes
-        btn_frame = ttk.Frame(left_frame)
-        btn_frame.grid(row=2, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=5)
-
-        ttk.Button(btn_frame, text="Nuevo Paciente", command=self.nuevo_paciente).pack(side=tk.LEFT, fill=tk.X, expand=True)
-        ttk.Button(btn_frame, text="Editar", command=self.editar_paciente).pack(side=tk.LEFT, fill=tk.X, expand=True)
-        ttk.Button(btn_frame, text="Eliminar", command=self.eliminar_paciente).pack(side=tk.LEFT, fill=tk.X, expand=True)
-            
+    
     def crear_pestana_fotos(self):
         """Crear interfaz para gestión de fotos"""
         # Frame para subir foto
@@ -359,7 +352,7 @@ class PodologiaApp:
         etiquetas_disponibles = self.db.obtener_etiquetas_disponibles()
         
         # Variables para checkboxes
-        self.etiquetas_seleccionadas = {}
+        etiquetas_seleccionadas = {}
         
         # Crear checkboxes en 2 columnas
         for i, etiqueta in enumerate(etiquetas_disponibles):
@@ -368,7 +361,7 @@ class PodologiaApp:
             row = i // 2
             col = i % 2
             cb.grid(row=row, column=col, sticky=tk.W, padx=5, pady=2)
-            self.etiquetas_seleccionadas[etiqueta] = var
+            etiquetas_seleccionadas[etiqueta] = var
         
         # Campo para nueva etiqueta
         ttk.Label(dialog, text="Nueva etiqueta:").grid(row=4, column=0, sticky=tk.W, padx=5, pady=5)
@@ -388,7 +381,7 @@ class PodologiaApp:
             )
             
             # Agregar etiquetas seleccionadas
-            for etiqueta, var in self.etiquetas_seleccionadas.items():
+            for etiqueta, var in etiquetas_seleccionadas.items():
                 if var.get():
                     self.db.agregar_etiqueta_paciente(paciente_id, etiqueta)
             
@@ -406,7 +399,7 @@ class PodologiaApp:
         dialog.columnconfigure(1, weight=1)
     
     def eliminar_paciente(self):
-
+        """Eliminar paciente seleccionado"""
         if not self.paciente_actual:
             messagebox.showwarning("Advertencia", "Selecciona un paciente primero")
             return
@@ -438,10 +431,11 @@ class PodologiaApp:
                     
             except Exception as e:
                 messagebox.showerror("Error", f"Error al eliminar paciente: {e}")
+    
     def agregar_cita(self):
         """Agregar nueva cita"""
         if not self.paciente_actual:
-            messagebox.showwarning("Advertencia", "Selecciona un paciente primero")
+            messagebox.showwarning("Adverdencia", "Selecciona un paciente primero")
             return
         
         self.db.agregar_cita(
@@ -566,6 +560,7 @@ class PodologiaApp:
             self.visor.bind('<Escape>', lambda e: self.visor.destroy())
 
     def editar_paciente(self):
+        """Ventana para editar paciente existente"""
         if not self.paciente_actual:
             messagebox.showwarning("Advertencia", "Selecciona un paciente primero")
             return
@@ -594,76 +589,76 @@ class PodologiaApp:
         
         # Etiquetas actuales del paciente
         etiquetas_actuales = self.db.obtener_etiquetas_paciente(self.paciente_actual[0])
-        
+
         ttk.Label(dialog, text="Etiquetas:").grid(row=3, column=0, sticky=tk.W, padx=5, pady=5)
-        
+
         # Frame para etiquetas disponibles
         etiquetas_frame = ttk.Frame(dialog)
         etiquetas_frame.grid(row=3, column=1, sticky=(tk.W, tk.E), padx=5, pady=5)
-        
+
         # Obtener etiquetas disponibles
         etiquetas_disponibles = self.db.obtener_etiquetas_disponibles()
-        
+
         # Variables para checkboxes
         etiquetas_seleccionadas = {}
-    
-    # Crear checkboxes en 2 columnas
-    for i, etiqueta in enumerate(etiquetas_disponibles):
-        var = tk.BooleanVar()
-        # Marcar si el paciente ya tiene esta etiqueta
-        if etiqueta in etiquetas_actuales:
-            var.set(True)
-        cb = ttk.Checkbutton(etiquetas_frame, text=etiqueta, variable=var)
-        row = i // 2
-        col = i % 2
-        cb.grid(row=row, column=col, sticky=tk.W, padx=5, pady=2)
-        etiquetas_seleccionadas[etiqueta] = var
-    
-    # Campo para nueva etiqueta
-    ttk.Label(dialog, text="Nueva etiqueta:").grid(row=4, column=0, sticky=tk.W, padx=5, pady=5)
-    nueva_etiqueta_entry = ttk.Entry(dialog, width=20)
-    nueva_etiqueta_entry.grid(row=4, column=1, sticky=(tk.W, tk.E), padx=5, pady=5)
-    
-    def guardar_cambios():
-        nombre = nombre_entry.get().strip()
-        if not nombre:
-            messagebox.showerror("Error", "El nombre es obligatorio")
-            return
+
+        # Crear checkboxes en 2 columnas
+        for i, etiqueta in enumerate(etiquetas_disponibles):
+            var = tk.BooleanVar()
+            # Marcar si el paciente ya tiene esta etiqueta
+            if etiqueta in etiquetas_actuales:
+                var.set(True)
+            cb = ttk.Checkbutton(etiquetas_frame, text=etiqueta, variable=var)
+            row = i // 2
+            col = i % 2
+            cb.grid(row=row, column=col, sticky=tk.W, padx=5, pady=2)
+            etiquetas_seleccionadas[etiqueta] = var
         
-        # Actualizar datos básicos del paciente
-        self.actualizar_paciente(
-            self.paciente_actual[0],
-            nombre,
-            telefono_entry.get(),
-            email_entry.get()
-        )
+        # Campo para nueva etiqueta
+        ttk.Label(dialog, text="Nueva etiqueta:").grid(row=4, column=0, sticky=tk.W, padx=5, pady=5)
+        nueva_etiqueta_entry = ttk.Entry(dialog, width=20)
+        nueva_etiqueta_entry.grid(row=4, column=1, sticky=(tk.W, tk.E), padx=5, pady=5)
         
-        # Actualizar etiquetas
-        etiquetas_a_mantener = []
+        def guardar_cambios():
+            nombre = nombre_entry.get().strip()
+            if not nombre:
+                messagebox.showerror("Error", "El nombre es obligatorio")
+                return
+            
+            # Actualizar datos básicos del paciente
+            self.actualizar_paciente(
+                self.paciente_actual[0],
+                nombre,
+                telefono_entry.get(),
+                email_entry.get()
+            )
+            
+            # Actualizar etiquetas
+            etiquetas_a_mantener = []
+            
+            # Agregar etiquetas seleccionadas
+            for etiqueta, var in etiquetas_seleccionadas.items():
+                if var.get():
+                    etiquetas_a_mantener.append(etiqueta)
+                    if etiqueta not in etiquetas_actuales:
+                        self.db.agregar_etiqueta_paciente(self.paciente_actual[0], etiqueta)
+            
+            # Remover etiquetas no seleccionadas
+            for etiqueta in etiquetas_actuales:
+                if etiqueta not in etiquetas_a_mantener:
+                    self.db.eliminar_etiqueta_paciente(self.paciente_actual[0], etiqueta)
+            
+            # Agregar nueva etiqueta si se especificó
+            nueva_etiqueta = nueva_etiqueta_entry.get().strip()
+            if nueva_etiqueta:
+                self.db.agregar_etiqueta_paciente(self.paciente_actual[0], nueva_etiqueta)
+            
+            # Actualizar interfaz
+            self.actualizar_lista_pacientes()
+            self.mostrar_info_paciente(self.paciente_actual)
+            dialog.destroy()
+            messagebox.showinfo("Éxito", "Paciente actualizado correctamente")
         
-        # Agregar etiquetas seleccionadas
-        for etiqueta, var in etiquetas_seleccionadas.items():
-            if var.get():
-                etiquetas_a_mantener.append(etiqueta)
-                if etiqueta not in etiquetas_actuales:
-                    self.db.agregar_etiqueta_paciente(self.paciente_actual[0], etiqueta)
-        
-        # Remover etiquetas no seleccionadas
-        for etiqueta in etiquetas_actuales:
-            if etiqueta not in etiquetas_a_mantener:
-                self.db.eliminar_etiqueta_paciente(self.paciente_actual[0], etiqueta)
-        
-        # Agregar nueva etiqueta si se especificó
-        nueva_etiqueta = nueva_etiqueta_entry.get().strip()
-        if nueva_etiqueta:
-            self.db.agregar_etiqueta_paciente(self.paciente_actual[0], nueva_etiqueta)
-        
-        # Actualizar interfaz
-        self.actualizar_lista_pacientes()
-        self.mostrar_info_paciente(self.paciente_actual)
-        dialog.destroy()
-        messagebox.showinfo("Éxito", "Paciente actualizado correctamente")
-    
         ttk.Button(dialog, text="Guardar Cambios", command=guardar_cambios).grid(row=5, column=1, sticky=tk.E, padx=5, pady=10)
         
         dialog.columnconfigure(1, weight=1)
